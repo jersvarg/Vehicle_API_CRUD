@@ -6,8 +6,18 @@ from pydantic import BaseModel, Field, EmailStr
 from bson import ObjectId 
 from typing import Optional, List 
 import motor.motor_asyncio
+from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI() 
+app = FastAPI()
+
+app.add_middleware(
+CORSMiddleware,
+allow_origins=["*"],
+allow_credentials=True,
+allow_methods=["*"],
+allow_headers=["*"],
+)
+
 #client = motor.motor_asyncio.AsyncIOMotorClient(os.environ["MONGODB_URL"])
 MONGODB_URL ='mongodb+srv://arbeyrios:eljers0n!!@cluster0.j1a4mkv.mongodb.net/test'
 client = motor.motor_asyncio.AsyncIOMotorClient(MONGODB_URL) 
@@ -53,7 +63,7 @@ class AutoModel(BaseModel):
 class UpdateAutoModel(BaseModel):
     Marca: Optional[str]
     Color: Optional[str]
-    Precio: Optional[int]
+    Precio: Optional[str]
     Modelo: Optional[str]
     Cilindraje: Optional[str]
 
@@ -69,7 +79,7 @@ class UpdateAutoModel(BaseModel):
             }
         }
 
-@app.post("/", response_description="Add new auto",response_model=AutoModel)
+@app.post("/", response_description="Add new Car",response_model=AutoModel)
 async def create_auto(auto: AutoModel = Body(...)):
     auto = jsonable_encoder(auto)
     new_auto = await db["automoviles"].insert_one(auto)
@@ -78,10 +88,10 @@ async def create_auto(auto: AutoModel = Body(...)):
 
 @app.get("/", response_description="List all autos", response_model=List[AutoModel])
 async def list_autos():
-    autos = await db["tripulantes"].find().to_list(1000)
+    autos = await db["automoviles"].find().to_list(1000)
     return autos
 
-@app.get("/{id}", response_description="Get a single auto", response_model=AutoModel)     
+@app.get("/{id}", response_description="Get a single car", response_model=AutoModel)     
 async def show_auto(id: str):
     if (auto := await db["automoviles"].find_one({"_id": id})) is not None:
         return auto
