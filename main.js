@@ -12,6 +12,7 @@ var app= new Vue({
         },
         dataEdit:null,
         isEdit:false,
+        input_value:"",
     },
     mounted() {
         axios.get("http://127.0.0.1:8000/")
@@ -20,8 +21,7 @@ var app= new Vue({
     },
     methods: {
         onSubmit(){
-            if(this.isEdit){
-                this.isEdit=false;
+            if(this.isEdit){                
                 axios.put("http://127.0.0.1:8000/"+this.dataEdit._id,this.form)
                 .then(res=>{
                     this.isEdit=false;
@@ -56,6 +56,14 @@ var app= new Vue({
             this.dataEdit=auto;
             this.isEdit=true
             //console.log(auto) muestra el auto selecionado en consola (html)
+        },
+        search_car(){
+            let item = document.querySelectorAll(".auto_items");
+            item.forEach(el=>{
+                !el.querySelector(".auto_item_marca").textContent.toLowerCase().includes(this.input_value.toLowerCase())?
+                el.classList.add("item_filter"):el.classList.remove("item_filter")
+            })
+            
         }        
     },    
 })
